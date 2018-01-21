@@ -3,16 +3,16 @@
 ## [我的CSDN博客](http://blog.csdn.net/fesdgasdgasdg/article/details/79121783 "文章地址")
 
 ## DBus项目突出的特点：
-* 1、注册消息事件的类可以是任意类(可能别人的项目也是)，不限定是Activity等特殊的类。
+* 1、注册消息事件的类可以是任意类(可能别人的项目也是)，不限定是Activity等特殊的类。<br/>
 只要你保证调用register和unRegister一对方法。<br/>
 否则DBus会一直持有此对象引用，可能会引起内存泄漏。<br/>
 
-* 2、支持使用特定方法名的函数接收消息；支持通过注解的方式标识某方法，使其变成消息接收方法。
+* 2、支持使用特定方法名的函数接收消息；支持通过注解的方式标识某方法，使其变成消息接收方法。<br/>
 使用下面方法设置是否使用方法名限定模式的方法，默认值为false，即使用注解方式。<br/>
 DBus.isUseMethodNameFind(true);//默认值为false<br/>
 注意：使用特定方法名或注解方式，二选一，不可兼得。一旦设置，立即生效。<br/>
 
-* 3、使用方法名限定的方式，记住如下限定规则：
+* 3、使用方法名限定的方式，记住如下限定规则：<br/>
 * a、记得打开方法名限定开关：DBus.isUseMethodNameFind(true);<br/>
 * b、方法名只能是以onUIEvent或onThreadEvent开头；<br/>
 * c、如果方法名以onUIEvent开头，表明此方法的执行是在UI线程，可以更新UI控件；<br/>
@@ -59,23 +59,23 @@ public void updateTextView(DData data){<br/>
 }
 
 ## DBus项目环境集成：
-这个应该不用说，做过android的朋友都知道。
-* 1、把DBus源码搬进你的项目中。
-* 2、把DBus库打包成jar包，方到你项目的libs中，记得添加引用。
-* 3、把DBus库打包成aar，方到你项目的libs中，记得添加引用。
-当然，用aar没意义，因为DBus项目中没有资源文件。
+这个应该不用说，做过android的朋友都知道。<br/>
+* 1、把DBus源码搬进你的项目中。<br/>
+* 2、把DBus库打包成jar包，方到你项目的libs中，记得添加引用。<br/>
+* 3、把DBus库打包成aar，方到你项目的libs中，记得添加引用。<br/>
+当然，用aar没意义，因为DBus项目中没有资源文件。<br/>
 
 ## DBus使用教程：
 ## 一、订阅者：
-* 1、订阅消息：
+* 1、订阅消息：<br/>
 在类的初始化方法注册事件，比喻Activity的onCreate方法中注册：<br/>
 DBus.getBus().register(this);
 
-* 2、取消订阅
+* 2、取消订阅<br/>
 在类的结束方法反注册，比喻Activity的onDestory方法中反注册：<br/>
-DBus.getBus().unRegister(this);
+DBus.getBus().unRegister(this);<br/>
 
-* 3、在当前类的某位置添加接收消息的方法：
+* 3、在当前类的某位置添加接收消息的方法：<br/>
 根据你对开关DBus.isUseMethodNameFind(boolean)的设置，选择合适的方法：<br/>
 public void onUIEventImageView(DData data){<br/>
 	//示例方法，非标准<br/>
@@ -92,33 +92,33 @@ public void dBusUpdateImageView(DData data){<br/>
 
 ## 二、发布者：
 可以在任意线程、任意位置发送消息。只要你确保接收消息的对象没有调用unRegister反注册方法，就能100%接收到消息。注意DData构造函数的port参数，及注解中的port参数。<br/>
-发送消息示例：
-* 1、最简方式：
-DBus.getBus().post(new DData(0));
+发送消息示例：<br/>
+* 1、最简方式：<br/>
+DBus.getBus().post(new DData(0));<br/>
 
-* 2、携带参数：
+* 2、携带参数：<br/>
 DData data = new DData(0);<br/>
 data.str1 = "成功";<br/>
 data.int1 = 40;<br/>
-DBus.getBus().post(data);
+DBus.getBus().post(data);<br/>
 
-* 3、携带自定义类的参数(注意：MyData extends DData)：
+* 3、携带自定义类的参数(注意：MyData extends DData)：<br/>
 MyData data = new MyData(54);<br/>
 data.str1 = "成功";<br/>
 data.int1 = 40;<br/>
 data.myValue = "自定义属性";<br/>
-DBus.getBus().post(data);
+DBus.getBus().post(data);<br/>
 
 
 ## 哪些订阅者能收到消息：
-* 1、如果是注解方式，即DBus.isUseMethodNameFind(false)
-则@DBusInject(port)和DBus.getBus().post(new DData(port));两处port值相等的地方才能够收到消息。
+* 1、如果是注解方式，即DBus.isUseMethodNameFind(false)<br/>
+则@DBusInject(port)和DBus.getBus().post(new DData(port));两处port值相等的地方才能够收到消息。<br/>
 
-* 2、如果是方法名限定方式，即DBus.isUseMethodNameFind(true)
+* 2、如果是方法名限定方式，即DBus.isUseMethodNameFind(true)<br/>
 则所有的订阅者类中，以onUIEvent和onThreadEvent开头的所有方法都能够收到消息。<br/>
-此时，你可以在具体的方法里面判断自定义的port值规则或DData里面的值，以决定哪些具体的方法才能够处理此事件。
+此时，你可以在具体的方法里面判断自定义的port值规则或DData里面的值，以决定哪些具体的方法才能够处理此事件。<br/>
 
-* 3、已经反注册的订阅者不会收到任何消息，无管是注解方式，还是方法名限定方式。因为DBus已经不再持有反注册的订阅者对象了。
+* 3、已经反注册的订阅者不会收到任何消息，无管是注解方式，还是方法名限定方式。因为DBus已经不再持有反注册的订阅者对象了。<br/>
 
 感谢各位码友支持！<br/>
 不要问为什么项目叫DBus，请原谅我自私的用了字母D。
