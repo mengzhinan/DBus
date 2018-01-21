@@ -1,6 +1,4 @@
-# DBus
-## DBus一个简易、高效的消息框架。
-## 没看过EventBus的源码，但是个人感觉此项目够简洁高效、易懂易用!
+## DBus一个简易、高效的消息框架。没看过EventBus的源码，但是个人感觉此项目够简洁高效、易懂易用!
 
 ## [我的CSDN博客](http://blog.csdn.net/fesdgasdgasdg/article/details/79121783 "文章地址")
 
