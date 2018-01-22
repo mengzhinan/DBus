@@ -35,6 +35,7 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
     * c、上面说了方法名限定开头，但不限定结尾，比喻可以是onUIEventForVideo(DData data)。<br/>
 
 ### 4、使用注解方式，有以下规则：
+<br/>
     * a、关闭方法名限定开关：DBus.isUseMethodNameFind(false);其实默认就是false的。<br/>
     * b、必须在方法前面设置注解@DBusInject()，注解有两个参数port和thread。<br/>
 	port：为必填项，参数值自定义设置。如果此方法的注解port值与发送处DData对象的port值一致，才能收到发送的消息。<br/>
@@ -42,6 +43,7 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 	即此方法是在UI线程还是在子线程执行。默认值为0，在主线程执行。即可以更新UI控件。<br/>
     * c、方法只能有一个参数。并且方法的参数类型必须是DData类型，不管消息发送处传递的是DData类还是子类对象。(同上)<br/>
     * d、父类或接口的方法无效，必须是当前类里面定义的方法。(同上)<br/>
+    
 
 以下是非限定条件：<br/>
     * a、[亮点]方法名任意；比喻haha(DData data);<br/>
