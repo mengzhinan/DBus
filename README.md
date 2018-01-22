@@ -13,7 +13,7 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 注意：使用特定方法名或注解方式，二选一，不可兼得。一旦设置，立即生效。<br/>
 
 * 3、使用方法名限定的方式，记住如下限定规则：<br/>
-** a、记得打开方法名限定开关：DBus.isUseMethodNameFind(true);<br/>
+	* a、记得打开方法名限定开关：DBus.isUseMethodNameFind(true);<br/>
 * b、方法名只能是以onUIEvent或onThreadEvent开头；<br/>
 * c、如果方法名以onUIEvent开头，表明此方法的执行是在UI线程，可以更新UI控件；<br/>
 * d、如果方法名以onThreadEvent开头，表明此方法是在子线程执行的，不可更新UI，但可做耗时操作；<br/>
