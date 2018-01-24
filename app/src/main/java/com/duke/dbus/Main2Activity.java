@@ -3,6 +3,7 @@ package com.duke.dbus;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ public class Main2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         DBus.getBus().register(this);
+        Log.v("dkdkdkdkdk","size = " + DBus.getTotalObjectSize());
         textView = findViewById(R.id.text2);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,39 +35,34 @@ public class Main2Activity extends AppCompatActivity {
         super.onDestroy();
         DBus.getBus().unRegister(this);
     }
-
     private void onUIEvent(DData dData) {
-        if (dData == null) {
-            return;
-        }
-        String thread = Thread.currentThread().getName();
-        int c = DBus.getTotalObjectSize();
-        if (dData instanceof SubData) {
-            SubData subData = (SubData) dData;
-            textView.setText(subData.name + "页面2");
-        } else {
-            textView.setText(dData.str1 + "页面2");
-        }
+        Log.v("dkdkdkdkdk", "Main2Activity.onUIEvent(), Thread = " + Thread.currentThread().getName());
     }
 
-    private void onThreadEvent(DData dData) {
-        if (dData == null) {
-            return;
-        }
-        String thread = Thread.currentThread().getName();
-        int c = DBus.getTotalObjectSize();
-        if (dData instanceof SubData) {
-            SubData subData = (SubData) dData;
-            textView.setText(subData.name + "页面2");
-        } else {
-            textView.setText(dData.str1 + "页面2");
-        }
+    private void onUIEventXXX(DData dData) {
+        Log.v("dkdkdkdkdk", "Main2Activity.onUIEventXXX(), Thread = " + Thread.currentThread().getName());
     }
 
-    @DBusInject(port = 4, thread = DThreadType.CHILD_THREAD)
-    public void asdflk(DData dData) {
-        int c = DBus.getTotalObjectSize();
-        String thread = Thread.currentThread().getName();
-        textView.setText(dData.str1 + "页面2注解");
+    public String onThreadEventXXX(DData dData) {
+        Log.v("dkdkdkdkdk", "Main2Activity.onThreadEventXXX(), Thread = " + Thread.currentThread().getName());
+        return "op";
+    }
+
+    @DBusInject(port = 2)
+    public int aaaaasd(DData dData) {
+        Log.v("dkdkdkdkdk", "Main2Activity.aaaaasd(port = 2), Thread = " + Thread.currentThread().getName());
+        return 0;
+    }
+
+    @DBusInject(port = 2, thread = DThreadType.CURRENT_CHILD_THREAD)
+    public int dddddddeds(DData dData) {
+        Log.v("dkdkdkdkdk", "Main2Activity.dddddddeds(port = 2,thread = DThreadType.CURRENT_CHILD_THREAD), Thread = " + Thread.currentThread().getName());
+        return 0;
+    }
+
+    @DBusInject(port = 2, thread = DThreadType.NEW_CHILD_THREAD)
+    private static int aazxs(DData dData) {
+        Log.v("dkdkdkdkdk", "Main2Activity.aazxs(port = 2,thread = DThreadType.NEW_CHILD_THREAD), Thread = " + Thread.currentThread().getName());
+        return 0;
     }
 }

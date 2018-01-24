@@ -7,8 +7,17 @@ package com.duke.dbuslib.constant;
  */
 public interface DThreadType {
     /**
-     * 1会认为是子线程，其他所有值都被认为是UI线程
+     * UI线程操作
      */
     int UI_THREAD = 0;
-    int CHILD_THREAD = 1;
+
+    /**
+     * 当前子线程
+     */
+    int CURRENT_CHILD_THREAD = 1;
+
+    /**
+     * new一个新的子线程
+     */
+    int NEW_CHILD_THREAD = 2;
 }

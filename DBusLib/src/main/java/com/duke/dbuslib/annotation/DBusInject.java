@@ -29,7 +29,7 @@ public @interface DBusInject {
     /**
      * 当前注解的方法在哪个线程中执行
      *
-     * @return 参考DThreadType接口定义  0：UI线程，1：子线程
+     * @return 参考DThreadType接口定义  0：UI线程，1、2：子线程
      */
     int thread() default DThreadType.UI_THREAD;
 

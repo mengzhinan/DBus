@@ -7,6 +7,7 @@
     tools:context="com.duke.dbus.Main3Activity">
     <TextView
         android:id="@+id/text3"
+        android:text="页面3"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </android.support.constraint.ConstraintLayout>

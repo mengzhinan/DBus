@@ -19,17 +19,28 @@ public class DMethod implements Serializable {
      */
     public Method method;
     /**
+     * 在哪个线程执行的方法，参考DThreadType接口
+     */
+    public int thread;
+    /**
      * 订阅函数的接收端口，同一端口的多个函数都可以接收到消息<br/>
      * 此端口并非网络通讯连接的端口，在此处只是一个形象的比喻
      */
     public int port;
 
-    public DMethod(Object subscriber, Method method, int port) {
+    /**
+     * 是否使用方法名为限定符
+     */
+    public boolean isUseMethodName;
+
+    public DMethod(Object subscriber, Method method, int thread, int port, boolean isUseMethodName) {
         if (subscriber == null || method == null) {
             throw new IllegalArgumentException("subscriber or method is null");
         }
         this.subscriber = subscriber;
         this.method = method;
+        this.thread = thread;
         this.port = port;
+        this.isUseMethodName = isUseMethodName;
     }
 }

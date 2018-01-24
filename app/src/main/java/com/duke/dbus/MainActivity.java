@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.duke.dbuslib.annotation.DBusInject;
 import com.duke.dbuslib.bean.DData;
+import com.duke.dbuslib.constant.DThreadType;
 import com.duke.dbuslib.core.DBus;
 
 
@@ -21,23 +22,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DBus.isUseMethodNameFind(true);
         DBus.getBus().register(this);
+        Log.v("dkdkdkdkdk", "size = " + DBus.getTotalObjectSize());
 
         textView = findViewById(R.id.test);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SubData data = new SubData(654);
-                        data.name = "asdf";
-                        DBus.getBus().post(data);
-                    }
-                }).start();*/
                 startActivity(new Intent(MainActivity.this, Main2Activity.class));
-
             }
         });
     }
@@ -49,22 +41,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onUIEvent(DData dData) {
-        textView.setText(dData.str1 + "页面1");
+        Log.v("dkdkdkdkdk", "MainActivity.onUIEvent(), Thread = " + Thread.currentThread().getName());
     }
 
-    @DBusInject(port = 4)
+    private void onUIEventXXX(DData dData) {
+        Log.v("dkdkdkdkdk", "MainActivity.onUIEventXXX(), Thread = " + Thread.currentThread().getName());
+    }
+
+    public String onThreadEventXXX(DData dData) {
+        Log.v("dkdkdkdkdk", "MainActivity.onThreadEventXXX(), Thread = " + Thread.currentThread().getName());
+        return "op";
+    }
+
+    @DBusInject(port = 1)
     public int aaaaasd(DData dData) {
-        if (dData == null) {
-            return 0;
-        }
-        int c = DBus.getTotalObjectSize();
-        textView.setText(dData.str1 + "页面1注解");
+        Log.v("dkdkdkdkdk", "MainActivity.aaaaasd(port = 1), Thread = " + Thread.currentThread().getName());
         return 0;
     }
 
-    void onThreadEventdsf(DData dData) {
-        String thread = Thread.currentThread().getName();
-        int c = DBus.getTotalObjectSize();
-        Log.v(TAG, "a16 static");
+    @DBusInject(port = 1, thread = DThreadType.CURRENT_CHILD_THREAD)
+    public int dddddddeds(DData dData) {
+        Log.v("dkdkdkdkdk", "MainActivity.dddddddeds(port = 1,thread = DThreadType.CURRENT_CHILD_THREAD), Thread = " + Thread.currentThread().getName());
+        return 0;
+    }
+
+    @DBusInject(port = 1, thread = DThreadType.NEW_CHILD_THREAD)
+    private static int aazxs(DData dData) {
+        Log.v("dkdkdkdkdk", "MainActivity.aazxs(port = 1,thread = DThreadType.NEW_CHILD_THREAD), Thread = " + Thread.currentThread().getName());
+        return 0;
     }
 }

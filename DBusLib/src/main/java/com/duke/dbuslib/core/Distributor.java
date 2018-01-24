@@ -32,7 +32,7 @@ public class Distributor {
         }
     }
 
-    static void post(final DMethod dMethod, final DData dData, int threadType) {
+    static void post(final DMethod dMethod, final DData dData) {
         if (dMethod == null || dData == null) {
             throw new IllegalArgumentException("dMethod or dData is null");
         }
@@ -40,27 +40,36 @@ public class Distributor {
             return;
         }
         try {
-            if (threadType == DThreadType.UI_THREAD) {
-                if (isUIThread()) {
+            if (dMethod.thread == DThreadType.UI_THREAD) {
+                /*if (isUIThread()) {
                     invoke(dMethod, dData);
-                } else {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(DMETHOD_NAME, dMethod);
-                    bundle.putSerializable(DDATA_NAME, dData);
-                    Message message = handler.obtainMessage();
-                    message.setData(bundle);
-                    handler.sendMessage(message);
-                }
+                } else {*/
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(DMETHOD_NAME, dMethod);
+                bundle.putSerializable(DDATA_NAME, dData);
+                Message message = handler.obtainMessage();
+                message.setData(bundle);
+                handler.sendMessage(message);
+                /*}*/
             } else {
-                if (isUIThread()) {
+                if (dMethod.thread == DThreadType.NEW_CHILD_THREAD) {
                     DExecutor.get().execute(new Runnable() {
                         @Override
                         public void run() {
                             invoke(dMethod, dData);
                         }
                     });
-                } else {
-                    invoke(dMethod, dData);
+                } else if (dMethod.thread == DThreadType.CURRENT_CHILD_THREAD) {
+                    if (isUIThread()) {
+                        DExecutor.get().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                invoke(dMethod, dData);
+                            }
+                        });
+                    } else {
+                        invoke(dMethod, dData);
+                    }
                 }
             }
         } catch (Exception e) {
