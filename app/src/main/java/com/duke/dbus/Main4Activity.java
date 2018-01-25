@@ -21,14 +21,14 @@ public class Main4Activity extends AppCompatActivity {
         setContentView(R.layout.activity_main4);
         textView = findViewById(R.id.text4);
         DBus.getBus().register(this);
-        Log.v("dkdkdkdkdk","size = " + DBus.getTotalObjectSize());
+        Log.v("dkdkdkdkdk", "size = " + DBus.getTotalObjectSize());
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        SubData data = new SubData(3);
+                        SubData data = new SubData(4, DData.THREAD_ALL);
                         data.name = "dbus发送---";
                         data.str1 = "默认值de";
                         DBus.getBus().post(data);

@@ -12,6 +12,10 @@ public class SubData extends DData {
     public SubData(int port) {
         super(port);
     }
+
+    public SubData(int port, int thread) {
+        super(port, thread);
+    }
     public String name;
     public int myInt;
 }

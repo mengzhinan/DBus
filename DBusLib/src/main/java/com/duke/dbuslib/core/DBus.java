@@ -194,16 +194,12 @@ public class DBus {
         if (dData == null || methodMap.size() <= 0) {
             return;
         }
-        //仅仅发送给注解的方法
-        boolean isJustInject = dData.port != 0;
         ArrayList<DMethod> dMethodList = null;
         DMethod dMethod = null;
         Set<Object> keySet = methodMap.keySet();
         for (Object key : keySet) {
             dMethodList = methodMap.get(key);
             if (dMethodList == null || dMethodList.size() <= 0) {
-                //key是不能重复的，即每个key只有一个list类型的value值
-                //找不到就直接退出循环
                 continue;
             }
             int methodSize = dMethodList.size();
@@ -214,16 +210,59 @@ public class DBus {
                         || dMethod.subscriber == null) {
                     continue;
                 }
-                if (isJustInject) {
-                    //仅仅注解方式
-                    if (dData.port == dMethod.port) {
-                        Distributor.post(dMethod, dData);
-                    }
-                } else {
-                    //全部
+                //处理每一个待调用的方法
+                accessThreadPost(dMethod, dData);
+            }
+        }
+    }
+
+    /**
+     * 对目标方法的线程类型判断处理
+     *
+     * @param dMethod
+     * @param dData
+     */
+    private void accessThreadPost(DMethod dMethod, DData dData) {
+        switch (dData.thread) {
+            case DData.THREAD_UI://只有UI线程的方法
+                if (dMethod.thread == DThreadType.UI_THREAD) {
+                    accessPortPost(dMethod, dData);
+                }
+                break;
+            case DData.THREAD_CHILD://只有子线程的方法
+                if (dMethod.thread == DThreadType.CURRENT_CHILD_THREAD
+                        || dMethod.thread == DThreadType.NEW_CHILD_THREAD) {
+                    accessPortPost(dMethod, dData);
+                }
+                break;
+            case DData.THREAD_ALL://所有线程的方法
+            default:
+                accessPortPost(dMethod, dData);
+                break;
+        }
+    }
+
+    /**
+     * 对目标方法的端口判断，已决定是否执行方法名的还是注解的方法
+     *
+     * @param dMethod
+     * @param dData
+     */
+    private void accessPortPost(DMethod dMethod, DData dData) {
+        switch (dData.port) {
+            case DData.PORT_RECEIVE_ALL://所有方法
+                Distributor.post(dMethod, dData);
+                break;
+            case DData.PORT_RECEIVE_METHOD_NAME://仅仅方法名限定的方法
+                if (dMethod.isUseMethodName) {
                     Distributor.post(dMethod, dData);
                 }
-            }
+                break;
+            default://仅仅注解方法，且端口号相等
+                if (!dMethod.isUseMethodName && dData.port == dMethod.port) {
+                    Distributor.post(dMethod, dData);
+                }
+                break;
         }
     }
 

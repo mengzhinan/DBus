@@ -51,26 +51,16 @@ public class Distributor {
                 message.setData(bundle);
                 handler.sendMessage(message);
                 /*}*/
-            } else {
-                if (dMethod.thread == DThreadType.NEW_CHILD_THREAD) {
-                    DExecutor.get().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            invoke(dMethod, dData);
-                        }
-                    });
-                } else if (dMethod.thread == DThreadType.CURRENT_CHILD_THREAD) {
-                    if (isUIThread()) {
-                        DExecutor.get().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                invoke(dMethod, dData);
-                            }
-                        });
-                    } else {
+            } else if (dMethod.thread == DThreadType.NEW_CHILD_THREAD
+                    || (dMethod.thread == DThreadType.CURRENT_CHILD_THREAD && isUIThread())) {
+                DExecutor.get().execute(new Runnable() {
+                    @Override
+                    public void run() {
                         invoke(dMethod, dData);
                     }
-                }
+                });
+            } else {
+                invoke(dMethod, dData);
             }
         } catch (Exception e) {
             e.printStackTrace();

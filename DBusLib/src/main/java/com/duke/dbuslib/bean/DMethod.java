@@ -29,7 +29,7 @@ public class DMethod implements Serializable {
     public int port;
 
     /**
-     * 是否使用方法名为限定符
+     * 是否使用方法名的方法，还是注解的方法
      */
     public boolean isUseMethodName;
 
