@@ -116,15 +116,14 @@
 * 2、注意消息接收方法的注解方式，有两个参数，端口和线程。port端口值建议大于0，至少不能等于DData.PORT_RECEIVE_METHOD_NAME = -1和DData.PORT_RECEIVE_ALL = 0两个常量值；thread值只建议使用DThreadType接口里面的3个常量值，分别表示0-UI线程，1-当前子线程，2-new子线程。<br/>
 
 * 3、发送方法DBus.getBus().post(data)的data参数，注意DData的构造函数public DData(int port, int thread){...}。<br/>
-port参数值：<br/>
-DData.PORT_RECEIVE_METHOD_NAME，表示只有方法名限定方式的消息接收方法能收到。<br/>
-DData.PORT_RECEIVE_ALL，表示所有的消息接收方法都能收到。<br/>
-如果不是以上值，则只有注解的方法，且port相等的才能收到。<br/>
-
-thread参数值：<br/>
-DData.THREAD_UI，表示只有UI线程的消息接收方法能收到。<br/>
-DData.THREAD_ALL，表示所有的消息接收方法都能收到。<br/>
-DData.THREAD_CHILD，表示只有子线程的消息接收方法能收到。<br/>
+> port参数值：<br/>
+> DData.PORT_RECEIVE_METHOD_NAME，表示只有方法名限定方式的消息接收方法能收到。<br/>
+> DData.PORT_RECEIVE_ALL，表示所有的消息接收方法都能收到。<br/>
+> 如果不是以上值，则只有注解的方法，且port相等的才能收到。<br/>
+> thread参数值：<br/>
+> DData.THREAD_UI，表示只有UI线程的消息接收方法能收到。<br/>
+> DData.THREAD_ALL，表示所有的消息接收方法都能收到。<br/>
+> DData.THREAD_CHILD，表示只有子线程的消息接收方法能收到。<br/>
 
 
 此处两个参数很关键，可以双重限制已达到特殊的一部分方法能收到消息的目的。<br/>
