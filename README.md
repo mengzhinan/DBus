@@ -4,21 +4,20 @@
 
 ## DBus项目突出的特点：
 * 1、注册消息事件的类可以是任意类(可能别人的项目也是)，不限定是Activity等特殊的类。<br/>
-只要你保证调用register和unRegister一对方法。<br/>
+只要你保证register和unRegister方法成对调用。<br/>
 否则DBus会一直持有此对象引用，可能会引起内存泄漏。<br/>
 
-* 2、支持使用特定方法名的函数接收消息；支持通过注解的方式标识某方法，使其变成消息接收方法。<br/>
-使用下面方法设置是否使用方法名限定模式的方法，默认值为false，即使用注解方式。<br/>
-DBus.isUseMethodNameFind(true);//默认值为false<br/>
-注意：使用特定方法名或注解方式，二选一，不可兼得。一旦设置，立即生效。<br/>
+* 2、支持使用特定方法名的函数接收消息；支持通过注解的方式标识某方法，使其变成消息接收的方法。<br/>
+如果方法前面有@DBusInject()注解，则此方法被当做DBus的注解方法处理；<br/>
+如果没有发现@DBusInject()注解，则在根据方法名限定规则来检查是否符合要求；<br/> 
+方法名限定规则为以onUIEvent开头或者onThreadEvent开头，分别表示在主线程和子线程接收消息的方法。<br/>
 
 * 3、使用方法名限定的方式，记住如下限定规则：<br/>
-	* a、记得打开方法名限定开关：DBus.isUseMethodNameFind(true);<br/>
-	* b、方法名只能是以onUIEvent或onThreadEvent开头；<br/>
-	* c、如果方法名以onUIEvent开头，表明此方法的执行是在UI线程，可以更新UI控件；<br/>
-	* d、如果方法名以onThreadEvent开头，表明此方法是在子线程执行的，不可更新UI，但可做耗时操作；<br/>
-	* e、方法只能有一个参数。并且方法的参数类型必须是DData类型，不管消息发送处传递的是DData类还是子类对象；<br/>
-	* f、父类或接口的方法无效，必须是当前类里面定义的方法。<br/>
+	* a、方法名只能是以onUIEvent或onThreadEvent开头；<br/>
+	* b、如果方法名以onUIEvent开头，表明此方法的执行是在UI线程，可以更新UI控件；<br/>
+	* c、如果方法名以onThreadEvent开头，表明此方法是在子线程执行的，不可更新UI，但可做耗时操作；<br/>
+	* d、方法只能有一个参数。并且方法的参数类型必须是DData类型，不管消息发送处传递的是DData类还是子类对象；<br/>
+	* e、父类或接口的方法无效，必须是当前类里面定义的方法。<br/>
 
 示例方法：<br/>
 > private void onUIEventXXX(DData data){<br/>
@@ -36,13 +35,12 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 
 ### 4、使用注解方式，有以下规则：
 <br/>
-	* a、关闭方法名限定开关：DBus.isUseMethodNameFind(false);其实默认就是false的。<br/>
-	* b、必须在方法前面设置注解@DBusInject()，注解有两个参数port和thread。<br/>
+	* a、必须在方法前面设置注解@DBusInject()，注解有两个参数port和thread。<br/>
 	port：为必填项，参数值自定义设置。如果此方法的注解port值与发送处DData对象的port值一致，才能收到发送的消息。<br/>
-	thread：选填项，参考DThreadType常量值，参数值为0或1，分别代表主线程和子线程。<br/>
-	即此方法是在UI线程还是在子线程执行。默认值为0，在主线程执行。即可以更新UI控件。<br/>
-	* c、方法只能有一个参数。并且方法的参数类型必须是DData类型，不管消息发送处传递的是DData类还是子类对象。(同上)<br/>
-	* d、父类或接口的方法无效，必须是当前类里面定义的方法。(同上)<br/>
+	thread：选填项，参考DThreadType常量值，参数值为0、1和2，分别代表主线程、当前子线程和新的子线程。<br/>
+	即此方法是在UI线程还是在子线程执行。默认值为0，在主线程执行，即可以更新UI控件。<br/>
+	* b、方法只能有一个参数。并且方法的参数类型必须是DData类型，不管消息发送处传递的是DData类还是子类对象。(同上)<br/>
+	* c、父类或接口的方法无效，必须是当前类里面定义的方法。(同上)<br/>
     
 
 以下是非限定条件：<br/>
@@ -51,7 +49,7 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 	* c、方法的返回值任意，可以是void、int、String等；(同上)<br/>
 
 示例方法：<br/>
-> @DBusInject(port = 1, thread = DThreadType.CHILD_THREAD)<br/>
+> @DBusInject(port = 1, thread = DThreadType.CURRENT_CHILD_THREAD)<br/>
 > private static int haha(DData data){<br/>
 >>  return 23;<br/>
 > }<br/>
@@ -79,7 +77,6 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 > DBus.getBus().unRegister(this);<br/>
 
 * 3、在当前类的某位置添加接收消息的方法：<br/>
-根据你对开关DBus.isUseMethodNameFind(boolean)的设置，选择合适的方法：<br/>
 > public void onUIEventImageView(DData data){<br/>
 >>  //示例方法，非标准<br/>
 >>  //如果data是你自定义的子类<br/>
@@ -97,31 +94,43 @@ DBus.isUseMethodNameFind(true);//默认值为false<br/>
 可以在任意线程、任意位置发送消息。只要你确保接收消息的对象没有调用unRegister反注册方法，就能100%接收到消息。注意DData构造函数的port参数，及注解中的port参数。<br/>
 发送消息示例：<br/>
 * 1、最简方式：<br/>
-> DBus.getBus().post(new DData(0));<br/>
+> DBus.getBus().post(new DData(1));<br/>
 
 * 2、携带参数：<br/>
-> DData data = new DData(0);<br/>
+> DData data = new DData(DData.PORT_RECEIVE_METHOD_NAME, DData.THREAD_UI);<br/>
 > data.str1 = "成功";<br/>
 > data.int1 = 40;<br/>
 > DBus.getBus().post(data);<br/>
 
 * 3、携带自定义类的参数(注意：MyData extends DData)：<br/>
-> MyData data = new MyData(54);<br/>
+> MyData data = new MyData(DData.PORT_RECEIVE_ALL);<br/>
 > data.str1 = "成功";<br/>
 > data.int1 = 40;<br/>
 > data.myValue = "自定义属性";<br/>
 > DBus.getBus().post(data);<br/>
 
 
-## 哪些订阅者能收到消息：
-* 1、如果是注解方式，即DBus.isUseMethodNameFind(false)<br/>
-则@DBusInject(port)和DBus.getBus().post(new DData(port));两处port值相等的地方才能够收到消息。<br/>
+## 注意事项，及哪些订阅者能收到消息：<br/>
+* 1、注意消息接收方法的方法名限定方式，有UI线程和子线程两种类型方法；<br/>
 
-* 2、如果是方法名限定方式，即DBus.isUseMethodNameFind(true)<br/>
-则所有的订阅者类中，以onUIEvent和onThreadEvent开头的所有方法都能够收到消息。<br/>
-此时，你可以在具体的方法里面判断自定义的port值规则或DData里面的值，以决定哪些具体的方法才能够处理此事件。<br/>
+* 2、注意消息接收方法的注解方式，有两个参数，端口和线程。port端口值建议大于0，至少不能等于DData.PORT_RECEIVE_METHOD_NAME = -1和DData.PORT_RECEIVE_ALL = 0两个常量值；thread值只建议使用DThreadType接口里面的3个常量值，分别表示0-UI线程，1-当前子线程，2-new子线程。<br/>
 
-* 3、已经反注册的订阅者不会收到任何消息，无管是注解方式，还是方法名限定方式。因为DBus已经不再持有反注册的订阅者对象了。<br/>
+* 3、发送方法DBus.getBus().post(data)的data参数，注意DData的构造函数public DData(int port, int thread){...}。<br/>
+port参数值：<br/>
+DData.PORT_RECEIVE_METHOD_NAME，表示只有方法名限定方式的消息接收方法能收到。<br/>
+DData.PORT_RECEIVE_ALL，表示所有的消息接收方法都能收到。<br/>
+如果不是以上值，则只有注解的方法，且port相等的才能收到。<br/>
+
+thread参数值：<br/>
+DData.THREAD_UI，表示只有UI线程的消息接收方法能收到。<br/>
+DData.THREAD_ALL，表示所有的消息接收方法都能收到。<br/>
+DData.THREAD_CHILD，表示只有子线程的消息接收方法能收到。<br/>
+
+
+此处两个参数很关键，可以双重限制已达到特殊的一部分方法能收到消息的目的。<br/>
+
+
+* 4、已经反注册的订阅者不会收到任何消息，无管是注解方式，还是方法名限定方式。因为DBus已经不再持有反注册的订阅者对象了。<br/>
 
 感谢各位码友支持！<br/>
 不要问为什么项目叫DBus，请原谅我自私的用了字母D。
